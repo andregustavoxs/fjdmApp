@@ -1,55 +1,75 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from './firebaseConfig';
-import {Text, TextInput, TouchableOpacity, View, StyleSheet} from "react-native";
+import { Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-native';
+import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from './firebaseConfig';
 
-const Login = () => {
+const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState('');
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            setMessage('Logado com sucesso');
-        } catch (error) {
-            setMessage('Usuário ou senha inválidos.');
+    const handleLogin = async () => {
+        if (!email || !password) {
+            alert('Por favor, insira um email e uma senha.');
+            return;
+        }
+
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('email', '==', email));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const userDoc = querySnapshot.docs[0];
+            const userData = userDoc.data();
+
+            if (userData.password === password) {
+                alert('Login bem-sucedido');
+            } else {
+                alert('Senha incorreta');
+            }
+        } else {
+            alert('Email inexistente');
         }
     };
 
     return (
-            <View style={styles.container}>
-                <Text style={styles.title}>Login</Text>
-                <View style={styles.form}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Email"
-                        value={email}
-                        onChangeText={setEmail}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Senha"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry
-                    />
-                    <TouchableOpacity onPress={handleLogin} style={styles.button}>
-                        <Text style={styles.buttonText}>Logar</Text>
-                    </TouchableOpacity>
-                </View>
-                {message ? <Text>{message}</Text> : null}
+        <View style={styles.container}>
+            <Text style={styles.title}>Login</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Senha"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+            />
+            <TouchableOpacity onPress={handleLogin} style={styles.button}>
+                <Text style={styles.buttonText}>Logar</Text>
+            </TouchableOpacity>
+            <View style={styles.linksContainer}>
+                <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                    <Text style={styles.link}>Cadastre-se</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+                    <Text style={styles.link}>Esqueci minha senha</Text>
+                </TouchableOpacity>
             </View>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f0f0f0',
+        alignItems: 'center',
+        backgroundColor: '#fff',
         padding: 20,
     },
     title: {
@@ -57,20 +77,16 @@ const styles = StyleSheet.create({
         marginBottom: 40,
         fontWeight: 'bold',
     },
-    form: {
-        width: '100%',
-    },
     input: {
-        marginVertical: 10,
-        padding: 15,
-        fontSize: 18,
-        backgroundColor: '#fff',
-        borderRadius: 5,
+        width: '100%',
+        padding: 10,
+        marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: '#ccc',
+        borderRadius: 5,
     },
     button: {
-        marginTop: 20,
+        width: '100%',
         padding: 15,
         backgroundColor: '#007BFF',
         borderRadius: 5,
@@ -78,14 +94,19 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: '#fff',
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
     },
-    message: {
+    linksContainer: {
         marginTop: 20,
-        fontSize: 16,
-        color: 'red',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    link: {
+        color: '#007BFF',
+        textDecorationLine: 'underline',
     },
 });
 
-export default Login;
+export default LoginScreen;
