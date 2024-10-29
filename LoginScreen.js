@@ -2,33 +2,18 @@ import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
+import {verificarSeOEmailESenhaEstaoVazios, verificarLogin} from './funcoes';
 
 const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleLogin = async () => {
-        if (!email || !password) {
-            alert('Por favor, insira um email e uma senha.');
+        if (!verificarSeOEmailESenhaEstaoVazios(email, password)) {
             return;
         }
 
-        const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('email', '==', email));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-            const userDoc = querySnapshot.docs[0];
-            const userData = userDoc.data();
-
-            if (userData.password === password) {
-                alert('Login bem-sucedido');
-            } else {
-                alert('Senha incorreta');
-            }
-        } else {
-            alert('Email inexistente');
-        }
+        await verificarLogin(email, password);
     };
 
     return (
