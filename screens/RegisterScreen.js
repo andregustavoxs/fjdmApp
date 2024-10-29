@@ -4,9 +4,9 @@ import {
     verificarSeOEmailEstaRegistrado,
     registrarUsuario,
     verificarSeAsSenhasSaoIguais,
-    verificarSeOsCamposEstaoVazios
-} from './funcoes';
-import {db} from "./firebaseConfig";
+    verificarSeOsCamposDaTelaDeRegistroEstaoVazios
+} from '../utils/funcoes';
+import {db} from "../config/firebaseConfig";
 
 const RegisterScreen = ({ navigation }) => {
     const [name, setName] = useState('');
@@ -17,7 +17,7 @@ const RegisterScreen = ({ navigation }) => {
     const [confirmPassword, setConfirmPassword] = useState('');
 
     const handleRegister = async () => {
-        if (!verificarSeOsCamposEstaoVazios(name, email, number, city, password, confirmPassword)) {
+        if (!verificarSeOsCamposDaTelaDeRegistroEstaoVazios(name, email, number, city, password, confirmPassword)) {
             return;
         }
 

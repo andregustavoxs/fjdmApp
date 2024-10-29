@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-native';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from './firebaseConfig';
-import {verificarSeOEmailESenhaEstaoVazios, verificarLogin} from './funcoes';
+import { db } from '../config/firebaseConfig';
+import {verificarSeOsCamposDaTelaDeLoginEstaoVazios, verificarLogin} from '../utils/funcoes';
 
 const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleLogin = async () => {
-        if (!verificarSeOEmailESenhaEstaoVazios(email, password)) {
+        if (!verificarSeOsCamposDaTelaDeLoginEstaoVazios(email, password)) {
             return;
         }
 
