@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View, StyleSheet } from 'react-native';
-import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../config/firebaseConfig';
+import { Text, TextInput, TouchableOpacity, View, StyleSheet, ImageBackground } from 'react-native';
 import {verificarSeOsCamposDaTelaDeLoginEstaoVazios, verificarLogin} from '../utils/funcoes';
 
 const LoginScreen = ({ navigation }) => {
@@ -18,6 +16,7 @@ const LoginScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            <ImageBackground source={require('../assets/Checkers.png')} style={styles.backgroundImage}></ImageBackground>
             <Text style={styles.title}>Login</Text>
             <TextInput
                 style={styles.input}
@@ -57,15 +56,22 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 20,
     },
+    backgroundImage: {
+        width: '100%',
+        height: 200,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     title: {
         fontSize: 32,
         marginBottom: 40,
         fontWeight: 'bold',
+        paddingTop: 30,
     },
     input: {
         width: '100%',
         padding: 10,
-        marginBottom: 20,
+        marginBottom: 30,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 5,
@@ -83,7 +89,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     linksContainer: {
-        marginTop: 20,
+        marginTop: 25,
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',

@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
+import {verificarSeOEmailEstaRegistrado} from "../utils/funcoes";
 
 const ForgotPasswordScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
 
-    const handlePasswordReset = () => {
-        Alert.alert('Email enviado', 'Enviamos o link para redefinir sua senha por e-mail!');
+    const redefinirSenha = async () => {
+        const oEmailExiste = await verificarSeOEmailEstaRegistrado(email);
+
+        if (oEmailExiste) {
+            Alert.alert('Email enviado', 'Enviamos o link para redefinir sua senha por e-mail!');
+        } else {
+            Alert.alert('Erro', 'O email não está cadastrado.');
+        }
     };
 
     return (
@@ -22,7 +29,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
                 keyboardType="email-address"
                 autoCapitalize="none"
             />
-            <TouchableOpacity onPress={handlePasswordReset} style={styles.button}>
+            <TouchableOpacity onPress={redefinirSenha} style={styles.button}>
                 <Text style={styles.buttonText}>Confirmar</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -41,19 +48,19 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     title: {
-        fontSize: 32,
-        marginBottom: 20,
+        fontSize: 30,
+        marginBottom: 30,
         fontWeight: 'bold',
     },
     description: {
-        fontSize: 16,
-        marginBottom: 20,
+        fontSize: 13,
+        marginBottom: 30,
         textAlign: 'center',
     },
     input: {
         width: '100%',
         padding: 10,
-        marginBottom: 20,
+        marginBottom: 30,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 5,

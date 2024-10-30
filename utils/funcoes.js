@@ -18,16 +18,16 @@ export const verificarSeOEmailEstaRegistrado = async (email) => {
 /**
  * Registra um novo usuário no banco de dados.
  *
- * @param {Object} userData - Os dados do usuário a serem registrados.
- * @param {Object} navigation - O objeto de navegação para redirecionamento após o registro.
+ * @param {Object} dadosDoUsuario - Os dados do usuário a serem registrados.
+ * @param {Object} navegacao - O objeto de navegação para redirecionamento após o registro.
  * @returns {Promise<void>} - Retorna uma promessa que resolve quando o registro for concluído.
  */
-export const registrarUsuario = async (userData, navigation) => {
-    const usersRef = collection(db, 'users');
+export const registrarUsuario = async (dadosDoUsuario, navegacao) => {
+    const referenciaUsuarios = collection(db, 'users');
     try {
-        await addDoc(usersRef, userData);
+        await addDoc(referenciaUsuarios, dadosDoUsuario);
         alert('Registro bem-sucedido');
-        await navigation.navigate('Login');
+        await navegacao.navigate('Login');
     } catch (error) {
         alert('Erro ao registrar: ' + error.message);
     }
@@ -101,13 +101,13 @@ export const verificarLogin = async (email, password) => {
  * @returns {Promise<Object|null>} - Retorna uma promessa que resolve para os dados do usuário se encontrado, caso contrário, `null`.
  */
 const obterDadosDoUsuarioPorEmail = async (email) => {
-    const usersRef = collection(db, 'users');
-    const q = query(usersRef, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
+    const referenciaUsuarios = collection(db, 'users');
+    const consulta = query(referenciaUsuarios, where('email', '==', email));
+    const resultadoConsulta = await getDocs(consulta);
 
-    if (!querySnapshot.empty) {
-        const userDoc = querySnapshot.docs[0];
-        return userDoc.data();
+    if (!resultadoConsulta.empty) {
+        const documentoUsuario = resultadoConsulta.docs[0];
+        return documentoUsuario.data();
     }
     return null;
 };

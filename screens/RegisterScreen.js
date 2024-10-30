@@ -36,7 +36,7 @@ const RegisterScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Registrar</Text>
+            <Text style={styles.title}>Criar Uma Conta</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Nome"
@@ -53,7 +53,7 @@ const RegisterScreen = ({ navigation }) => {
             />
             <TextInput
                 style={styles.input}
-                placeholder="Número"
+                placeholder="Número de Telefone"
                 value={number}
                 onChangeText={setNumber}
                 keyboardType="phone-pad"
