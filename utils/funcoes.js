@@ -1,6 +1,7 @@
 // utils.js
 import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
+import { Animated } from 'react-native';
 
 /**
  * Verifica se um email já está registrado no banco de dados.
@@ -128,4 +129,22 @@ const validarCredenciaisDoUsuario = (userData, password) => {
     } else {
         alert('Email inexistente');
     }
+};
+
+/**
+ * Cria uma animação quando o usuário abre o aplicativo e navega para a tela de login após a animação.
+ *
+ * @param {Animated.Value} animacao - O valor de animação para controlar a opacidade.
+ * @param {Object} navegacao - O objeto de navegação para redirecionamento após a animação.
+ */
+export const criarAnimacaoDeSplash = (animacao, navegacao) => {
+    Animated.timing(animacao, {
+        toValue: 1,
+        duration: 2000,
+        useNativeDriver: true,
+    }).start(() => {
+        setTimeout(() => {
+            navegacao.replace('Login');
+        }, 2000);
+    });
 };

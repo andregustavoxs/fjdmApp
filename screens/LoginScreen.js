@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View, StyleSheet, ImageBackground } from 'react-native';
+import { Text, TextInput, TouchableOpacity, View, StyleSheet, Image } from 'react-native';
 import {verificarSeOsCamposDaTelaDeLoginEstaoVazios, verificarLogin} from '../utils/funcoes';
 
 const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = async () => {
+    const validarLogin = async () => {
         if (!verificarSeOsCamposDaTelaDeLoginEstaoVazios(email, password)) {
             return;
         }
@@ -16,7 +16,7 @@ const LoginScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <ImageBackground source={require('../assets/Checkers.png')} style={styles.backgroundImage}></ImageBackground>
+            <Image source={require('../assets/logo-fjdm-sem-fundo.png')} style={styles.logo} />
             <Text style={styles.title}>Login</Text>
             <TextInput
                 style={styles.input}
@@ -33,7 +33,7 @@ const LoginScreen = ({ navigation }) => {
                 onChangeText={setPassword}
                 secureTextEntry
             />
-            <TouchableOpacity onPress={handleLogin} style={styles.button}>
+            <TouchableOpacity onPress={validarLogin} style={styles.button}>
                 <Text style={styles.buttonText}>Logar</Text>
             </TouchableOpacity>
             <View style={styles.linksContainer}>
@@ -56,17 +56,16 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 20,
     },
-    backgroundImage: {
-        width: '100%',
-        height: 200,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     title: {
         fontSize: 32,
         marginBottom: 40,
         fontWeight: 'bold',
         paddingTop: 30,
+    },
+    logo: {
+        width: 150,
+        height: 150,
+        marginBottom: 20,
     },
     input: {
         width: '100%',
