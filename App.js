@@ -19,6 +19,9 @@ import EventInfoScreen from './screens/EventInfoScreen'
 import TournamentRegistrationScreen from './screens/TournamentRegistrationScreen'
 import TournamentRegistration2Screen from './screens/TournamentRegistration2Screen'
 import AccountInfoScreen from './screens/AccountInfoScreen'
+import ListScreen from './screens/ListScreen'
+
+
 
 const Stack = createStackNavigator()
 
@@ -90,6 +93,11 @@ export default function App() {
           name="Informações da Conta"
           component={AccountInfoScreen}
           options={{ headerShown: false}}
+        />
+        <Stack.Screen
+          name="Lista de Participantes"
+          component={ListScreen}
+          options={{ headerShown: true, title: "Participantes do Torneio" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

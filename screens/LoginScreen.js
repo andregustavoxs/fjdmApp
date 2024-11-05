@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   Text,
   TextInput,
@@ -6,25 +6,24 @@ import {
   View,
   StyleSheet,
   Image
-} from 'react-native'
+} from 'react-native';
 import {
   verificarSeOsCamposDaTelaDeLoginEstaoVazios,
   verificarLogin
-} from '../utils/funcoes'
+} from '../utils/funcoes';
 
 export default function LoginScreen({ navigation, route }) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const { screenName } = route.params ? route.params : '' // Pega o nome da tela anterior
+  const { screenName } = route.params ? route.params : ''; // Nome da tela anterior
 
   const validarLogin = async () => {
     if (!verificarSeOsCamposDaTelaDeLoginEstaoVazios(email, password)) {
-      return
+      return;
     }
-
-    await verificarLogin(email, password, screenName, navigation)
-  }
+    await verificarLogin(email, password, screenName, navigation);
+  };
 
   return (
     <View style={styles.container}>
@@ -32,7 +31,7 @@ export default function LoginScreen({ navigation, route }) {
         source={require('../assets/logo-fjdm-sem-fundo.png')}
         style={styles.logo}
       />
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Bem-vindo</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -40,6 +39,7 @@ export default function LoginScreen({ navigation, route }) {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        placeholderTextColor="#a0a0a0"
       />
       <TextInput
         style={styles.input}
@@ -47,9 +47,10 @@ export default function LoginScreen({ navigation, route }) {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        placeholderTextColor="#a0a0a0"
       />
       <TouchableOpacity onPress={validarLogin} style={styles.button}>
-        <Text style={styles.buttonText}>Logar</Text>
+        <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
       <View style={styles.linksContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('Register')}>
@@ -60,7 +61,7 @@ export default function LoginScreen({ navigation, route }) {
         </TouchableOpacity>
       </View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -68,48 +69,63 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 20
+    backgroundColor: '#f9f9f9',
+    padding: 20,
   },
   title: {
-    fontSize: 32,
-    marginBottom: 40,
-    fontWeight: 'bold',
-    paddingTop: 30
+    fontSize: 28,
+    marginBottom: 30,
+    fontWeight: '600',
+    color: '#333',
   },
   logo: {
-    width: 150,
-    height: 150,
-    marginBottom: 20
+    width: 120,
+    height: 120,
+    marginBottom: 30,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: '#007BFF',
   },
   input: {
     width: '100%',
-    padding: 10,
-    marginBottom: 30,
+    padding: 12,
+    marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5
+    borderColor: '#d3d3d3',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 2,
   },
   button: {
     width: '100%',
     padding: 15,
     backgroundColor: '#007BFF',
-    borderRadius: 5,
-    alignItems: 'center'
+    borderRadius: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 3,
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   linksContainer: {
-    marginTop: 25,
+    marginTop: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%'
+    width: '100%',
   },
   link: {
     color: '#007BFF',
-    textDecorationLine: 'underline'
+    fontSize: 14,
+    fontWeight: '500',
   }
-})
+});

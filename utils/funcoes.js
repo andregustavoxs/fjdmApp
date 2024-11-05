@@ -186,14 +186,14 @@ export const getAllTournaments = async () => {
 }
 
 // Obtem os nomes das categories de um torneio pelo id desse torneio
-export const getCategoriesByTournamentId = async tournamentId => {
+export const getCategoriesByTournamentId = async tournament_id => {
 
   const tournamentsCategoriesRef = collection(db, 'tournaments_categories')
   const categoriesRef = collection(db, 'categories')
 
   const tournamentsCategoriesQuery = query(
     tournamentsCategoriesRef,
-    where('tournament_id', '==', `tournaments/${tournamentId}`)
+    where('tournament_id', '==', `tournaments/${tournament_id}`)
   )
   const tournamentsCategoriesDocs = await getDocs(tournamentsCategoriesQuery)
 
@@ -281,4 +281,45 @@ export const chooseStatus = (
       return status_per_period
     }
   }
-}
+};
+
+
+
+export const fetchTournamentParticipants = async (tournamentId) => {
+  try {
+    // Primeiro, busca todos os registros de usuários para o torneio específico
+    const userTournamentsRef = collection(db, 'users_tournaments');
+    const q = query(userTournamentsRef, where('tournament_id', '==', tournamentId));
+    const userTournamentsSnapshot = await getDocs(q);
+    
+    // Array para armazenar os IDs dos usuários
+    const userIds = [];
+    userTournamentsSnapshot.forEach(doc => {
+      userIds.push(doc.data().user_id);
+    });
+    
+    // Agora busca os dados dos usuários
+    const usersRef = collection(db, 'users');
+    const participants = [];
+    
+    // Busca os dados de cada usuário
+    for (const userId of userIds) {
+      const userQuery = query(usersRef, where('id', '==', userId));
+      const userSnapshot = await getDocs(userQuery);
+      
+      userSnapshot.forEach(doc => {
+        participants.push({
+          id: doc.id,
+          name: doc.data().name,
+          city: doc.data().city
+        });
+      });
+    }
+    
+    return participants;
+    
+  } catch (error) {
+    console.error('Erro ao buscar participantes:', error);
+    throw error;
+  }
+};
