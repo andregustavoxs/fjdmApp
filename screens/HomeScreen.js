@@ -184,9 +184,9 @@ const HomeScreen = ({ navigation, route }) => {
           <Text style={styles.navIcon}>🔍</Text>
           <Text style={styles.navText}>Buscar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton}>
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Configurações')}>
           <Text style={styles.navIcon}>⚙️</Text>
-          <Text style={styles.navText}>Config</Text>
+          <Text style={styles.navText}>Configurações</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           style={styles.navButton}

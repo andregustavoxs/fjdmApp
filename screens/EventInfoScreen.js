@@ -170,6 +170,12 @@ export default function EventInfoScreen({ route, navigation }) {
 
           <View style={styles.buttonGroup}>
             <TouchableOpacity
+                style={[styles.button, styles.outlineButton]}
+                onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.outlineButtonText}>Voltar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
               style={[styles.button, styles.outlineButton]}
               onPress={() => navigation.navigate('Lista de Participantes', {"tournamentId": eventId})}
             >

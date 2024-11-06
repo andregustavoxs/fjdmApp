@@ -450,7 +450,7 @@ export default function SearchEventScreen({ navigation, route }) {
         >
           <Text style={styles.navIcon}>🔍</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Configurações')}>
           <Text style={styles.navIcon}>⚙️</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -466,61 +466,95 @@ export default function SearchEventScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
   header: { marginBottom: 5, marginTop: 40, padding: 16 },
-  title: { fontSize: 24, fontWeight: 'bold' },
+  title: { fontSize: 24, fontWeight: 'bold', color: '#1E293B' },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
-    padding: 16
+    padding: 16,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    width: '90%',
+    alignSelf: 'center', // Centraliza o container
   },
   searchInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-    padding: 8
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    padding: 8,
+    backgroundColor: '#F1F5F9',
+    color: '#1E293B',
   },
   filterButton: { marginLeft: 8 },
-  filterIcon: { fontSize: 24 },
+  filterIcon: { fontSize: 24, color: '#64748B' },
   filterContainer: { marginBottom: 16, padding: 16 },
-  filterOptionButton: {
-    padding: 8,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 4,
-    marginVertical: 4
-  },
-  filterOptionButtonText: { fontSize: 16 },
+    filterOptionButton: {
+        padding: 12,
+        backgroundColor: '#10B981',
+        borderRadius: 12,
+        marginVertical: 8,
+        alignItems: 'center',
+    },
+    filterOptionButtonText: {
+        fontSize: 16,
+        color: '#FFFFFF',
+        fontWeight: '600',
+    },
   modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   filterOptions: {
     width: '80%',
     backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 16
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  filterOption: { padding: 8 },
-  optionText: { fontSize: 16 },
+    filterOption: {
+        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E2E8F0',
+    },
+  optionText: { fontSize: 16, color: '#1E293B' },
   datePeriodContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginVertical: 16
+    marginVertical: 16,
   },
-  datePeriodButton: { padding: 8, backgroundColor: '#f0f0f0', borderRadius: 4 },
-  datePeriodButtonText: { fontSize: 16 },
+  datePeriodButton: {
+    padding: 8,
+    backgroundColor: '#E2E8F0',
+    borderRadius: 12,
+  },
+  datePeriodButtonText: { fontSize: 16, color: '#1E293B' },
   eventList: { padding: 16, flexGrow: 1 },
-  eventCard: {
-    padding: 16,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 4,
-    marginBottom: 8
-  },
-  eventTitle: { fontSize: 18, fontWeight: 'bold' },
+    eventCard: {
+        padding: 16,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        marginBottom: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+  eventTitle: { fontSize: 18, fontWeight: 'bold', color: '#1E293B',  marginBottom: 8 },
   eventButton: {
     marginTop: 8,
-    backgroundColor: '#007BFF',
-    borderRadius: 4,
-    padding: 8
+    backgroundColor: '#3B82F6',
+    borderRadius: 12,
+    padding: 8,
   },
   eventButtonText: { color: '#fff', textAlign: 'center' },
   bottomNav: {
@@ -528,11 +562,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingVertical: 10,
-    backgroundColor: '#fff',
+backgroundColor: '#fff',
     borderTopWidth: 1,
-    borderColor: '#ddd'
+    borderColor: '#E2E8F0',
   },
   navIcon: {
-    fontSize: 24
-  }
-})
+    fontSize: 24,
+    color: '#64748B',
+  },
+});

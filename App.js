@@ -20,6 +20,8 @@ import TournamentRegistrationScreen from './screens/TournamentRegistrationScreen
 import TournamentRegistration2Screen from './screens/TournamentRegistration2Screen'
 import AccountInfoScreen from './screens/AccountInfoScreen'
 import ListScreen from './screens/ListScreen'
+import SettingsScreen from './screens/SettingsScreen';
+import {Settings} from "react-native";
 
 const Stack = createStackNavigator()
 
@@ -92,6 +94,11 @@ export default function App() {
           name="Lista de Participantes"
           component={ListScreen}
           options={{ headerShown: true, title: 'Participantes do Torneio' }}
+        />
+        <Stack.Screen
+            name="Configurações"
+            component={SettingsScreen}
+            options={{ headerShown: true, title: '' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
