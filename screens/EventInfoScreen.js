@@ -14,7 +14,8 @@ import {
   chooseStatus,
   formatDate,
   formatTime,
-  getCategoriesByTournamentId
+  getCategoriesByTournamentId,
+  registerParticipantOnTournament
 } from '../utils/funcoes';
 
 
@@ -23,6 +24,17 @@ export default function EventInfoScreen({ route, navigation }) {
   const [eventCategories, setEventCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const registerParticipantAndAlert = async () => {
+
+    if (loggedUser) {
+
+      await registerParticipantOnTournament(eventId, loggedUser);
+      alert('Participação confirmada!');
+    
+    }
+    
+  }
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -159,7 +171,7 @@ export default function EventInfoScreen({ route, navigation }) {
           <View style={styles.buttonGroup}>
             <TouchableOpacity
               style={[styles.button, styles.outlineButton]}
-              onPress={() => navigation.navigate('Lista de Participantes')}
+              onPress={() => navigation.navigate('Lista de Participantes', {"tournamentId": eventId})}
             >
               <Text style={styles.outlineButtonText}>Ver Participantes</Text>
             </TouchableOpacity>
@@ -173,7 +185,7 @@ export default function EventInfoScreen({ route, navigation }) {
 
             <TouchableOpacity
               style={[styles.button, styles.primaryButton]}
-              onPress={() => alert('Participação confirmada!')}
+              onPress={ registerParticipantAndAlert }
             >
               <Text style={styles.primaryButtonText}>Quero Participar</Text>
             </TouchableOpacity>

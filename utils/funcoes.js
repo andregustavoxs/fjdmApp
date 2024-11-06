@@ -26,8 +26,18 @@ export const verificarSeOEmailEstaRegistrado = async email => {
 export const registrarUsuario = async (dadosDoUsuario, navegacao) => {
   const referenciaUsuarios = collection(db, 'users')
   const is_admin = false
+
+  const { name, email, number, city, password } = dadosDoUsuario
+
   try {
-    await addDoc(referenciaUsuarios, { dadosDoUsuario, is_admin })
+    await addDoc(referenciaUsuarios, {
+      name,
+      email,
+      number,
+      city,
+      password,
+      is_admin
+    })
     alert('Registro bem-sucedido')
     await navegacao.navigate('Login')
   } catch (error) {
@@ -109,6 +119,9 @@ export const verificarLogin = async (
 ) => {
   const userData = await obterDadosDoUsuarioPorEmail(email)
 
+  console.log(userData.id)
+  console.log(userData.email)
+
   if (validarCredenciaisDoUsuario(userData, password)) {
     await navigation.navigate(previousScreen, { loggedUser: userData })
   }
@@ -127,7 +140,16 @@ const obterDadosDoUsuarioPorEmail = async email => {
 
   if (!resultadoConsulta.empty) {
     const documentoUsuario = resultadoConsulta.docs[0]
-    return documentoUsuario.data()
+
+    const id = documentoUsuario.id;
+    const name = documentoUsuario.data().name;
+    const email = documentoUsuario.data().email;
+    const password = documentoUsuario.data().password;
+    const city = documentoUsuario.data().city;
+    const is_admin = documentoUsuario.data().is_admin;
+    const number = documentoUsuario.data().number;
+
+    return {id, name, email, password, city, is_admin, number}
   }
   return null
 }
@@ -187,7 +209,6 @@ export const getAllTournaments = async () => {
 
 // Obtem os nomes das categories de um torneio pelo id desse torneio
 export const getCategoriesByTournamentId = async tournament_id => {
-
   const tournamentsCategoriesRef = collection(db, 'tournaments_categories')
   const categoriesRef = collection(db, 'categories')
 
@@ -201,22 +222,18 @@ export const getCategoriesByTournamentId = async tournament_id => {
   const categoriesDocs = await getDocs(categoriesQuery)
 
   const contextCategories = categoriesDocs.docs.filter(doc => {
+    const contextCategoriesId = tournamentsCategoriesDocs.docs.map(
+      doc2 => doc2.data().category_id
+    )
 
-    const contextCategoriesId = tournamentsCategoriesDocs.docs.map(doc2 => doc2.data().category_id)
+    return contextCategoriesId.includes(`categories/${doc.id}`)
+  })
 
-    console.log(contextCategoriesId);
-    console.log(doc.id);
-
-    return contextCategoriesId.includes(`categories/${doc.id}`);
-
-  });
-
-  console.log(contextCategories);
-
-  const contextCategoriesNames = contextCategories.map((categorySnapshot) => categorySnapshot.data().name)
+  const contextCategoriesNames = contextCategories.map(
+    categorySnapshot => categorySnapshot.data().name
+  )
 
   return contextCategoriesNames
-  
 }
 
 // Função para formatar a data no formato "dd/mm/yyyy"
@@ -281,45 +298,96 @@ export const chooseStatus = (
       return status_per_period
     }
   }
-};
+}
 
-
-
-export const fetchTournamentParticipants = async (tournamentId) => {
+export const fetchTournamentParticipants = async tournamentId => {
   try {
     // Primeiro, busca todos os registros de usuários para o torneio específico
-    const userTournamentsRef = collection(db, 'users_tournaments');
-    const q = query(userTournamentsRef, where('tournament_id', '==', tournamentId));
-    const userTournamentsSnapshot = await getDocs(q);
+    const userTournamentsRef = collection(db, 'users_tournaments')
+    const q = query(
+      userTournamentsRef,
+      where('tournament_id', '==', `tournaments/${tournamentId}`)
+    )
+    const userTournamentsSnapshot = await getDocs(q)
+
+    const userTournamentsParticipationSnapshot =
+      userTournamentsSnapshot.docs.filter(
+        doc => {
+          console.log(doc.data().relation_type)
+          console.log(doc.data().relation_type === 'participation')
+          return doc.data().relation_type === 'participation'
+        }
+      )
     
+    console.log(userTournamentsParticipationSnapshot);
+
     // Array para armazenar os IDs dos usuários
-    const userIds = [];
-    userTournamentsSnapshot.forEach(doc => {
-      userIds.push(doc.data().user_id);
-    });
-    
+    const userIds = []
+    userTournamentsParticipationSnapshot.forEach(doc => {
+      userIds.push(doc.data().user_id)
+    })
+
+    console.log('userIds', userIds)
+
     // Agora busca os dados dos usuários
-    const usersRef = collection(db, 'users');
-    const participants = [];
-    
+    const usersRef = collection(db, 'users')
+    const participants = []
+
     // Busca os dados de cada usuário
-    for (const userId of userIds) {
-      const userQuery = query(usersRef, where('id', '==', userId));
-      const userSnapshot = await getDocs(userQuery);
-      
-      userSnapshot.forEach(doc => {
-        participants.push({
-          id: doc.id,
-          name: doc.data().name,
-          city: doc.data().city
-        });
-      });
-    }
-    
-    return participants;
-    
+    const userQuery = query(usersRef)
+    const userSnapshot = await getDocs(userQuery)
+
+    console.log(userSnapshot.docs.map(doc => doc.data().name))
+
+    const participantsDocs = userSnapshot.docs.filter(doc => {
+
+      const userIds = userTournamentsParticipationSnapshot.map(
+        doc2 => doc2.data().user_id
+      )
+  
+      return userIds.includes(`users/${doc.id}`);
+
+    })
+
+    participantsDocs.forEach(doc => {
+      participants.push({
+        id: doc.id,
+        name: doc.data().name,
+        city: doc.data().city
+      })
+    })
+
+    return participants
   } catch (error) {
-    console.error('Erro ao buscar participantes:', error);
-    throw error;
+    console.error('Erro ao buscar participantes:', error)
+    throw error
   }
-};
+}
+
+const checkIfParticipantIsAlreadyRegistered = async (tournamentId, loggedUser) => {
+
+  const usersTournamentsRef = collection(db, "users_tournaments");
+  const thisUserTournamentQuery = query(usersTournamentsRef, 
+                                        [where("tournament_id", "==", `tournaments/${tournamentId}`), 
+                                         where("user_id", "==", `users/${loggedUser.id}`),
+                                         where("relation_type", "==", "participation")]);
+  const thisUserTournamentSnapshot = await getDocs(thisUserTournamentQuery);
+
+  return !thisUserTournamentSnapshot.empty;
+  
+}
+
+// Registra um participante em um torneio
+// Não valida ainda se esse participante já está registrado nesse torneio antes de registrá-lo
+export const registerParticipantOnTournament = async (tournamentId, loggedUser) => {
+
+  const response = await checkIfParticipantIsAlreadyRegistered(tournamentId, loggedUser);
+
+  if (!response) {
+    await addDoc(usersTournamentsRef, {
+      user_id: `users/${loggedUser.id}`,
+      tournament_id: `tournaments/${tournamentId}`,
+      relation_type: "participation"
+    });
+  }
+}
