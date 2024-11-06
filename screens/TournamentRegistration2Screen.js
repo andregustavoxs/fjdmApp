@@ -19,6 +19,8 @@ export default function TournamentRegistration2Screen({ navigation, route }) {
 
   const registerAndRedirectHome = async () => {
 
+    console.log(loggedUser);
+
     await registerTournament(tournamentData, loggedUser, categories)
     navigation.navigate('Home', { loggedUser })
 
@@ -38,7 +40,8 @@ export default function TournamentRegistration2Screen({ navigation, route }) {
       // Relaciona o torneio cadastrado ao usuário logado
       await addDoc(usersTournamentsRef, {
         user_id: `users/${loggedUser.id}`,
-        tournament_id: `tournaments/${registeredTournament.id}`
+        tournament_id: `tournaments/${registeredTournament.id}`,
+        relation_type: "creation",
       });
 
       const categoriesQuery = query(
