@@ -21,8 +21,6 @@ import TournamentRegistration2Screen from './screens/TournamentRegistration2Scre
 import AccountInfoScreen from './screens/AccountInfoScreen'
 import ListScreen from './screens/ListScreen'
 
-
-
 const Stack = createStackNavigator()
 
 export default function App() {
@@ -52,34 +50,30 @@ export default function App() {
         <Stack.Screen
           name="Splash"
           component={SplashScreen}
-          options={{ headerShown: false}}
+          options={{ headerShown: false }}
         />
-        { console.log(HomeScreen)}
+        {console.log(HomeScreen)}
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ headerShown: false}}
-        />
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ headerShown: false}}
-        />
-        <Stack.Screen
-          name="Register"
-          component={RegisterScreen}
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen
           name="ForgotPassword"
           component={ForgotPasswordScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="Buscar Torneio" component={SearchEventScreen} options={{ headerShown: false }}/>
+        <Stack.Screen
+          name="Buscar Torneio"
+          component={SearchEventScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="Informações do Torneio"
           component={EventInfoScreen}
-          options={{ headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Cadastro de Torneio (1/2)"
@@ -92,12 +86,12 @@ export default function App() {
         <Stack.Screen
           name="Informações da Conta"
           component={AccountInfoScreen}
-          options={{ headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Lista de Participantes"
           component={ListScreen}
-          options={{ headerShown: true, title: "Participantes do Torneio" }}
+          options={{ headerShown: true, title: 'Participantes do Torneio' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
