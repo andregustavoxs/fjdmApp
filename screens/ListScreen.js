@@ -1,15 +1,17 @@
 import {React, useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import {fetchTournamentParticipants} from '../utils/funcoes.js';
-import {where} from 'firebase/firestore'
 
 // Função para buscar os participantes de um torneio específico
 
 
-const TournamentParticipantsScreen = ({ tournamentId }) => {
+const TournamentParticipantsScreen = ({ navigate, route }) => {
+  
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { tournamentId } = route.params
 
   useEffect(() => {
     const loadParticipants = async () => {
