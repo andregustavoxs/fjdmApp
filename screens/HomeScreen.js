@@ -1,325 +1,351 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StyleSheet
-} from 'react-native'
-import { getAllTournaments, chooseStatus } from '../utils/funcoes.js' // Ajuste para a função que retorna os eventos
+  StyleSheet,
+  SafeAreaView,
+  StatusBar,
+  Animated,
+} from 'react-native';
+import { getAllTournaments, chooseStatus } from '../utils/funcoes.js';
 
-export default function HomeScreen({ navigation, route }) {
-  const [eventName, setEventName] = useState('')
-  const [allEvents, setAllEvents] = useState([]) // Inicializa com array vazio
-  const [filteredEvents, setFilteredEvents] = useState([])
+const HomeScreen = ({ navigation, route }) => {
+  const [eventName, setEventName] = useState('');
+  const [allEvents, setAllEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const { loggedUser } = route.params || {};
+  const scrollY = new Animated.Value(0);
 
-  const { loggedUser } = route.params ? route.params : {}
-
-  // Filtra apenas os eventos que irão começar em 20 dias e que terminaram em 20 dias
+  // Mantendo a lógica de filtros e useEffects existente...
   const filterByDate = () => {
-    setFilteredEvents(
-      allEvents.filter(eventSnapshot => {
-        const event = eventSnapshot.data()
+    const twentyDaysFromNow = new Date();
+    const twentyDaysAgo = new Date();
+    twentyDaysFromNow.setDate(twentyDaysFromNow.getDate() + 20);
+    twentyDaysAgo.setDate(twentyDaysAgo.getDate() - 20);
 
-        const tournamentStartDate = new Date(
-          event.tournament_start_date.seconds * 1000
-        )
-        const tournamentEndDate = new Date(
-          event.tournament_end_date.seconds * 1000
-        )
+    const eventsInDateRange = allEvents.filter(eventSnapshot => {
+      const event = eventSnapshot.data();
+      const tournamentStartDate = new Date(event.tournament_start_date.seconds * 1000);
+      const tournamentEndDate = new Date(event.tournament_end_date.seconds * 1000);
+      return tournamentStartDate >= twentyDaysAgo && tournamentEndDate <= twentyDaysFromNow;
+    });
 
-        const startDatePeriod = new Date()
-        const endDatePeriod = new Date()
-
-        startDatePeriod.setHours(0)
-        startDatePeriod.setMinutes(0)
-        startDatePeriod.setSeconds(0)
-
-        startDatePeriod.setDate(startDatePeriod.getDate() - 20)
-
-        endDatePeriod.setHours(0)
-        endDatePeriod.setMinutes(0)
-        endDatePeriod.setSeconds(0)
-
-        endDatePeriod.setDate(endDatePeriod.getDate() + 20)
-
-        return (
-          tournamentStartDate >= startDatePeriod &&
-          tournamentEndDate <= endDatePeriod
-        )
-      })
-    )
-  }
+    setFilteredEvents(eventsInDateRange);
+  };
 
   useEffect(() => {
-
-    console.log("UseEffect Executado!")
-    
     const fetchEvents = async () => {
       try {
-        const events = await getAllTournaments() // Carrega os dados assincronamente
-        setAllEvents(events)
+        const events = await getAllTournaments();
+        setAllEvents(events);
       } catch (error) {
         console.error('Erro ao carregar eventos:', error);
       }
-    }
-
+    };
     fetchEvents();
-  }, [])
+  }, []);
 
-  // Só irá chamar o filtro quando allEvents for resolvido
   useEffect(() => {
     if (allEvents.length > 0) {
-      console.log("Filtrando eventos por data!");
       filterByDate();
     }
   }, [allEvents]);
 
-  /* Realizar a filtragem dos eventos */
   useEffect(() => {
-    if (eventName) {
-      const fetchEventsByName = () => {
-        try {
-          const filteredEventsByName = allEvents.filter(eventSnapshot => {
-            const event = eventSnapshot.data()
-
-            return event.name.toLowerCase().includes(eventName.toLowerCase())
-          })
-
-          filterByDate() // Reseta o filteredEvents
-
-          setFilteredEvents(
-            filteredEventsByName.filter(eventSnapshot => {
-              const dateFilteredEventNames = filteredEvents.map(
-                eventSnapshot2 => eventSnapshot2.data().name
-              )
-
-              return dateFilteredEventNames.includes(eventSnapshot.data().name)
-            })
-          )
-        } catch (error) {
-          console.error('Erro ao carregar eventos:', error)
-        }
+    const fetchEventsByName = () => {
+      if (eventName) {
+        const filteredByName = allEvents.filter(eventSnapshot => {
+          const event = eventSnapshot.data();
+          return event.name.toLowerCase().includes(eventName.toLowerCase());
+        });
+        setFilteredEvents(filteredByName);
+      } else {
+        filterByDate();
       }
-      fetchEventsByName()
-    } else {
-      filterByDate()
+    };
+    fetchEventsByName();
+  }, [eventName]);
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Em andamento':
+        return '#10B981';
+      case 'Inscrições abertas':
+        return '#3B82F6';
+      case 'Finalizado':
+        return '#6B7280';
+      default:
+        return '#F59E0B';
     }
-  }, [eventName])
+  };
+
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [200, 120],
+    extrapolate: 'clamp',
+  });
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        {/* Apenas gestores (is_admin == true) podem criar torneios*/}
-        <View style={styles.headerButtons}>
-          {loggedUser && loggedUser.is_admin && (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      
+      {/* Animated Header */}
+      <Animated.View style={[styles.header, { height: headerHeight }]}>
+        <View style={styles.headerContent}>
+          {loggedUser && loggedUser.is_admin ? (
             <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('Cadastro de Torneio (1/2)', { loggedUser })
-              }
-              style={styles.plusButton}
+              onPress={() => navigation.navigate('Cadastro de Torneio (1/2)', { loggedUser })}
+              style={styles.addButton}
             >
-              <Text style={styles.plusButtonText}>+</Text>
+              <Text style={styles.addButtonText}>Criar Torneio</Text>
             </TouchableOpacity>
-          )}
-          {!loggedUser && (
+          ) : (
             <TouchableOpacity
               style={styles.loginButton}
-              onPress={() =>
-                navigation.navigate('Login', { screenName: 'Home' })
-              }
+              onPress={() => navigation.navigate('Login', { screenName: 'Home' })}
             >
-              <Text style={styles.loginText}>Logar</Text>
+              <Text style={styles.loginText}>Entrar</Text>
             </TouchableOpacity>
           )}
+          <Text style={styles.title}>Torneios Recentes</Text>
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Buscar torneios..."
+              placeholderTextColor="#94A3B8"
+              value={eventName}
+              onChangeText={setEventName}
+            />
+          </View>
         </View>
-
-        <Text style={styles.title}>Lista de Torneios</Text>
-      </View>
-
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar"
-          value={eventName}
-          onChangeText={setEventName}
-        />
-      </View>
+      </Animated.View>
 
       {/* Tournament List */}
-      { !allEvents ? (<View style={ styles.loadingContainer }>
-        <Text style={ styles.loadingText }>Carregando Eventos...</Text>
-      </View>) : (<ScrollView style={styles.tournamentList}>
-        {filteredEvents.map(eventSnapshot => {
-          const event = eventSnapshot.data()
+      {allEvents.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Carregando torneios...</Text>
+        </View>
+      ) : (
+        <Animated.ScrollView
+          style={styles.tournamentList}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          scrollEventThrottle={16}
+        >
+          {filteredEvents.map(eventSnapshot => {
+            const event = eventSnapshot.data();
+            const tournamentStartDate = new Date(event.tournament_start_date.seconds * 1000);
+            const tournamentEndDate = new Date(event.tournament_end_date.seconds * 1000);
+            const registrationStartDate = new Date(event.registration_start_date.seconds * 1000);
+            const registrationEndDate = new Date(event.registration_end_date.seconds * 1000);
+            const status = chooseStatus(tournamentStartDate, tournamentEndDate, registrationStartDate, registrationEndDate);
 
-          const tournamentStartDate = new Date(
-            event.tournament_start_date.seconds * 1000
-          )
-          const tournamentEndDate = new Date(
-            event.tournament_end_date.seconds * 1000
-          )
-          const registrationStartDate = new Date(
-            event.registration_start_date.seconds * 1000
-          )
-          const registrationEndDate = new Date(
-            event.registration_end_date.seconds * 1000
-          )
-
-          return (
-            <View key={eventSnapshot.id} style={styles.eventCard}>
-              <Text style={styles.eventTitle}>{event.name}</Text>
-              <Text>{`Status: ${chooseStatus(
-                tournamentStartDate,
-                tournamentEndDate,
-                registrationStartDate,
-                registrationEndDate
-              )}`}</Text>
-              <Text>{`Data de Início: ${tournamentStartDate.toLocaleDateString()}`}</Text>
-              <Text>{`Data de Término: ${tournamentEndDate.toLocaleDateString()}`}</Text>
+            return (
               <TouchableOpacity
+                key={eventSnapshot.id}
+                style={styles.eventCard}
                 onPress={() =>
                   navigation.navigate('Informações do Torneio', {
                     eventContext: event,
                     eventId: eventSnapshot.id,
-                    loggedUser: loggedUser
+                    loggedUser,
                   })
                 }
-                style={styles.eventButton}
               >
-                <Text style={styles.eventButtonText}>Ver Detalhes</Text>
+                <View style={styles.eventHeader}>
+                  <Text style={styles.eventTitle}>{event.name}</Text>
+                  <View style={[styles.statusBadge, { backgroundColor: getStatusColor(status) }]}>
+                    <Text style={styles.statusText}>{status}</Text>
+                  </View>
+                </View>
+                <View style={styles.eventDetails}>
+                  <Text style={styles.eventDate}>
+                    📅 {tournamentStartDate.toLocaleDateString()} - {tournamentEndDate.toLocaleDateString()}
+                  </Text>
+                </View>
               </TouchableOpacity>
-            </View>
-          )
-        })}
-      </ScrollView>)}
+            );
+          })}
+        </Animated.ScrollView>
+      )}
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Home', { loggedUser })}
-        >
-          <Text style={styles.navIcon}>🏠</Text>
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Home', { loggedUser })}>
+          <Text style={[styles.navIcon, styles.activeNav]}>🏠</Text>
+          <Text style={[styles.navText, styles.activeNav]}>Início</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Buscar Torneio', { loggedUser })}
-        >
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Buscar Torneio', { loggedUser })}>
           <Text style={styles.navIcon}>🔍</Text>
+          <Text style={styles.navText}>Buscar</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity style={styles.navButton}>
           <Text style={styles.navIcon}>⚙️</Text>
+          <Text style={styles.navText}>Config</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate('Informações da Conta', { loggedUser })
-          }
+        <TouchableOpacity 
+          style={styles.navButton}
+          onPress={() => navigation.navigate('Informações da Conta', { loggedUser })}
         >
           <Text style={styles.navIcon}>👤</Text>
+          <Text style={styles.navText}>Perfil</Text>
         </TouchableOpacity>
       </View>
-    </View>
-  )
-}
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8'
+    backgroundColor: '#F8FAFC',
   },
   header: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    margin: 20
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  headerButtons: {
-    alignItems: 'center',
-    padding: 20,
-    margin: 10
+  headerContent: {
+    flex: 1,
+    justifyContent: 'space-between',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold'
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#1E293B',
+    marginVertical: 16,
   },
-  plusButton: {
-    position: 'absolute',
-    right: 175,
+  addButton: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignSelf: 'flex-end',
   },
-  plusButtonText: {
-    fontSize: 20
+  addButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
   },
   loginButton: {
-    backgroundColor: '#64C8A9',
-    position: 'absolute',
-    left: 120,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8
+    backgroundColor: '#3B82F6',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignSelf: 'flex-end',
   },
   loginText: {
     color: '#fff',
-    fontWeight: 'bold'
-  },
-  loadingContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loadingText: {
-    fontSize: 20,
-    color: "#000",
+    fontWeight: '600',
+    fontSize: 16,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginVertical: 10
+    marginBottom: 16,
   },
   searchInput: {
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    fontSize: 16,
+    color: '#1E293B',
+  },
+  loadingContainer: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 10
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#64748B',
   },
   tournamentList: {
     flex: 1,
-    paddingHorizontal: 20
+    padding: 20,
   },
   eventCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
     padding: 16,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 4,
-    marginBottom: 8
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  eventTitle: { fontSize: 18, fontWeight: 'bold' },
-  eventButton: {
-    marginTop: 8,
-    backgroundColor: '#007BFF',
-    borderRadius: 4,
-    padding: 8
+  eventHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  eventButtonText: { color: '#fff', textAlign: 'center' },
-  openText: {
-    color: '#64C8A9',
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 10
+  eventTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1E293B',
+    flex: 1,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginLeft: 12,
+  },
+  statusText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  eventDetails: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  eventDate: {
+    fontSize: 14,
+    color: '#64748B',
   },
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingVertical: 10,
     backgroundColor: '#fff',
+    paddingVertical: 12,
     borderTopWidth: 1,
-    borderColor: '#ddd'
+    borderTopColor: '#E2E8F0',
+  },
+  navButton: {
+    alignItems: 'center',
   },
   navIcon: {
-    fontSize: 24
-  }
-})
+    fontSize: 24,
+    marginBottom: 4,
+  },
+  navText: {
+    fontSize: 12,
+    color: '#64748B',
+  },
+  activeNav: {
+    color: '#3B82F6',
+  },
+});
+
+export default HomeScreen;
